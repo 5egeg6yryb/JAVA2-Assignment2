@@ -1,7 +1,16 @@
 package cn.edu.sustech.cs209.chatting.client;
 
 import cn.edu.sustech.cs209.chatting.common.Message;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -19,11 +28,22 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Controller implements Initializable {
+    @FXML
+    Label currentUsername;
+    @FXML
+    ListView<String> chatList;
 
+    Set<String> chatListName = new HashSet<>();
+    @FXML
+    TextArea inputArea;
     @FXML
     ListView<Message> chatContentList;
 
     String username;
+
+    Scanner in = Main.in;
+    PrintWriter out = Main.out;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -39,24 +59,72 @@ public class Controller implements Initializable {
                TODO: Check if there is a user with the same name among the currently logged-in users,
                      if so, ask the user to change the username
              */
-            username = input.get();
+
+            while (true) {
+                username = input.get();
+                out.println("CheckUser " + username);
+                out.flush();
+
+                if (in.nextInt() == 0){
+
+                    currentUsername.setText(username);
+
+                    out.println("AddUser " + username);
+                    out.flush();
+                    break;
+                }
+                else{
+                    System.out.println("change username");
+                    Platform.exit();
+                }
+            }
+
         } else {
             System.out.println("Invalid username " + input + ", exiting");
             Platform.exit();
         }
 
+        chatList.getSelectionModel().selectedItemProperty().addListener(
+            (ObservableValue<? extends String> observable, String oldValue, String newValue) ->{
+                System.out.println("Jump: " + newValue);
+                chatContentList.getItems().clear();
+                Main.To = newValue;
+                out.println("Jump" + " " + username + " " +newValue);
+                out.flush();
+            });
+
+
         chatContentList.setCellFactory(new MessageCellFactory());
+        new Thread(new ClientService(chatContentList, chatList)).start();
+
     }
 
+
     @FXML
-    public void createPrivateChat() {
+    public void createPrivateChat() throws InterruptedException {
         AtomicReference<String> user = new AtomicReference<>();
 
         Stage stage = new Stage();
         ComboBox<String> userSel = new ComboBox<>();
 
         // FIXME: get the user list from server, the current user's name should be filtered out
-        userSel.getItems().addAll("Item 1", "Item 2", "Item 3");
+        out.println("GetUser");
+        out.flush();
+
+        Thread.sleep(100);
+
+        String list = Main.list;
+        String [] tokens = list.split("@");
+
+        System.out.println("list:");
+        System.out.println(list);
+
+        for (String token : tokens) {
+            if (!token.equals(username)) {
+                userSel.getItems().add(token);
+            }
+        }
+        // userSel.getItems().addAll(names);
 
         Button okBtn = new Button("OK");
         okBtn.setOnAction(e -> {
@@ -73,6 +141,21 @@ public class Controller implements Initializable {
 
         // TODO: if the current user already chatted with the selected user, just open the chat with that user
         // TODO: otherwise, create a new chat item in the left panel, the title should be the selected user's name
+
+        Main.To = user.get();
+
+        if (!chatListName.contains(user.get())){
+            chatList.getItems().add(user.get());
+            chatListName.add(user.get());
+            chatContentList.getItems().clear();
+        }
+        else{
+            chatContentList.getItems().clear();
+            out.println("Jump" + " " + username + " " + Main.To);
+            out.flush();
+        }
+
+
     }
 
     /**
@@ -86,7 +169,79 @@ public class Controller implements Initializable {
      * UserA, UserB (2)
      */
     @FXML
-    public void createGroupChat() {
+    public void createGroupChat() throws InterruptedException {
+        AtomicReference<String> user = new AtomicReference<>();
+        AtomicReference<String> membersName = new AtomicReference<>();
+
+        Stage stage = new Stage();
+        ListView<String> GroupSel = new ListView<>();
+
+        out.println("GetUser");
+        out.flush();
+
+        Thread.sleep(100);
+
+        String list = Main.list;
+        String [] tokens = list.split("@");
+
+        System.out.println("list:");
+        System.out.println(list);
+
+        for (String token : tokens) {
+            if (!token.equals(username)) {
+                GroupSel.getItems().add(token);
+            }
+        }
+
+        Button okBtn = new Button("OK");
+
+        GroupSel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+
+        okBtn.setOnAction(e -> {
+            String s = GroupSel.getSelectionModel().getSelectedItems().toString();
+            s = s.substring(1, s.length()-1);
+            s = s.replace(" ", "");
+            s += "," + username;
+            System.out.println(s);
+            membersName.set(s);
+            String[] token = s.split(",");
+            Arrays.sort(token);
+            System.out.println("sort: " + Arrays.toString(token));
+            if (token.length == 2){
+                user.set(token[0] + "," + token[1] + "(2)");
+            }
+            else {
+                user.set(token[0] + "," + token[1] + "," + token[2] + "(" + token.length + ")...");
+            }
+
+            stage.close();
+
+        });
+
+        HBox box = new HBox(10);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(20, 20, 20, 20));
+        box.getChildren().addAll(GroupSel, okBtn);
+        stage.setScene(new Scene(box));
+        stage.showAndWait();
+
+        String members = membersName.get();
+        members = members.replace(" ", "");
+
+        if (!chatListName.contains(user.get())){
+            chatList.getItems().add(user.get());
+            chatListName.add(user.get());
+            Main.To = user.get();
+            out.println("BuildGroup " + user + " " +  members);
+            out.flush();
+            System.out.println("BuildGroup " + user + " " +  members);
+
+        }
+        chatContentList.getItems().clear();
+        out.println("Jump" + " " + username + " " + Main.To);
+        out.flush();
+
     }
 
     /**
@@ -98,6 +253,32 @@ public class Controller implements Initializable {
     @FXML
     public void doSendMessage() {
         // TODO
+        String data = inputArea.getText();
+        if (!data.equals("")) {
+            if (!Main.To.contains("(")){
+
+            Message message = new Message(System.currentTimeMillis(), username, Main.To, data);
+            chatContentList.getItems().add(message);
+            inputArea.setText("");
+
+            out.println("Send " + message.getTimestamp() + " " + message.getSentBy() + " "
+                + message.getSendTo() + " " + message.getData().replace("\n", "#"));
+            out.flush();
+            }
+            else{
+                Message message = new Message(System.currentTimeMillis(), username, Main.To, data);
+                chatContentList.getItems().add(message);
+                inputArea.setText("");
+
+                out.println("SendGroup " + message.getTimestamp() + " " + message.getSentBy() + " "
+                    + message.getSendTo() + " " + message.getData().replace("\n", "#"));
+                out.flush();
+
+
+            }
+        }
+
+
     }
 
     /**
@@ -113,6 +294,8 @@ public class Controller implements Initializable {
                 public void updateItem(Message msg, boolean empty) {
                     super.updateItem(msg, empty);
                     if (empty || Objects.isNull(msg)) {
+                        setText(null);
+                        setGraphic(null);
                         return;
                     }
 
@@ -140,4 +323,5 @@ public class Controller implements Initializable {
             };
         }
     }
+
 }
