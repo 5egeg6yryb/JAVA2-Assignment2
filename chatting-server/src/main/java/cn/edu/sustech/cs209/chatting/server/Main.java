@@ -29,6 +29,7 @@ public class Main {
             ServerService c = new ServerService(s);
             Thread t = new Thread(c);
             t.start();
+            System.out.println("Client Close");
 
         }
     }

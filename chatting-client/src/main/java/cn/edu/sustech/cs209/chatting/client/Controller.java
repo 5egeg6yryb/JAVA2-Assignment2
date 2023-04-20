@@ -144,15 +144,16 @@ public class Controller implements Initializable {
 
         Main.To = user.get();
 
-        if (!chatListName.contains(user.get())){
-            chatList.getItems().add(user.get());
-            chatListName.add(user.get());
-            chatContentList.getItems().clear();
-        }
-        else{
-            chatContentList.getItems().clear();
-            out.println("Jump" + " " + username + " " + Main.To);
-            out.flush();
+        if ((Main.To!=null)&&(!Main.To.equals("null"))) {
+            if (!chatListName.contains(user.get())) {
+                chatList.getItems().add(user.get());
+                chatListName.add(user.get());
+                chatContentList.getItems().clear();
+            } else {
+                chatContentList.getItems().clear();
+                out.println("Jump" + " " + username + " " + Main.To);
+                out.flush();
+            }
         }
 
 
@@ -182,7 +183,7 @@ public class Controller implements Initializable {
         Thread.sleep(100);
 
         String list = Main.list;
-        String [] tokens = list.split("@");
+        String[] tokens = list.split("@");
 
         System.out.println("list:");
         System.out.println(list);
@@ -197,25 +198,26 @@ public class Controller implements Initializable {
 
         GroupSel.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-
         okBtn.setOnAction(e -> {
             String s = GroupSel.getSelectionModel().getSelectedItems().toString();
-            s = s.substring(1, s.length()-1);
-            s = s.replace(" ", "");
-            s += "," + username;
-            System.out.println(s);
-            membersName.set(s);
-            String[] token = s.split(",");
-            Arrays.sort(token);
-            System.out.println("sort: " + Arrays.toString(token));
-            if (token.length == 2){
-                user.set(token[0] + "," + token[1] + "(2)");
-            }
-            else {
-                user.set(token[0] + "," + token[1] + "," + token[2] + "(" + token.length + ")...");
-            }
+            s = s.substring(1, s.length() - 1);
+            if (!s.equals("")) {
+                s = s.replace(" ", "");
+                s += "," + username;
+                System.out.println(s);
+                membersName.set(s);
+                String[] token = s.split(",");
+                Arrays.sort(token);
+                System.out.println("sort: " + Arrays.toString(token));
+                if (token.length == 2) {
+                    user.set(token[0] + "," + token[1] + "(2)");
+                } else {
+                    user.set(
+                        token[0] + "," + token[1] + "," + token[2] + "(" + token.length + ")...");
+                }
 
-            stage.close();
+                stage.close();
+            }
 
         });
 
@@ -227,21 +229,23 @@ public class Controller implements Initializable {
         stage.showAndWait();
 
         String members = membersName.get();
-        members = members.replace(" ", "");
+        if (members != null) {
+            members = members.replace(" ", "");
 
-        if (!chatListName.contains(user.get())){
-            chatList.getItems().add(user.get());
-            chatListName.add(user.get());
-            Main.To = user.get();
-            out.println("BuildGroup " + user + " " +  members);
+            if (!chatListName.contains(user.get())) {
+                chatList.getItems().add(user.get());
+                chatListName.add(user.get());
+                Main.To = user.get();
+                out.println("BuildGroup " + user + " " + members);
+                out.flush();
+                System.out.println("BuildGroup " + user + " " + members);
+
+            }
+            chatContentList.getItems().clear();
+            out.println("Jump" + " " + username + " " + Main.To);
             out.flush();
-            System.out.println("BuildGroup " + user + " " +  members);
 
         }
-        chatContentList.getItems().clear();
-        out.println("Jump" + " " + username + " " + Main.To);
-        out.flush();
-
     }
 
     /**

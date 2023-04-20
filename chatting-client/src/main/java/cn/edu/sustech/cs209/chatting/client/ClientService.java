@@ -32,7 +32,10 @@ public class ClientService implements Runnable {
         in = Main.in;
         out = Main.out;
         doService();
-      } finally {
+      } catch (Exception e){
+
+      }
+      finally {
         Main.s.close();
         System.out.println("Server Closed");
         Platform.runLater(new Runnable() {
@@ -44,8 +47,11 @@ public class ClientService implements Runnable {
         });
 
       }
-    } catch (IOException exception) {
+    } catch (Exception exception) {
       exception.printStackTrace();
+    }
+    finally {
+      System.out.println("Client Closed");
     }
   }
 
@@ -91,10 +97,14 @@ public class ClientService implements Runnable {
               }
               for (int i = 0; i<chatList.getItems().size();i++){
                 if (chatList.getItems().get(i).equals(sendBy)){
-                  chatList.getSelectionModel().select(i);
-                  Main.To = chatList.getItems().get(i);
-                  break;
+//                  chatList.getSelectionModel().select(i);
+//                  Main.To = chatList.getItems().get(i);
+
                   // tell server the message is new, then "server" send you have a new message
+                  out.println("New " + timestamp + " " + "server" + " " + sendTo + " "
+                      + "NewMessageBy" + sendBy);
+                  out.flush();
+                  break;
                 }
               }
             }

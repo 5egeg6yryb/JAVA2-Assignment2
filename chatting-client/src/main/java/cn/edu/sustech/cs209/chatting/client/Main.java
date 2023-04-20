@@ -19,8 +19,8 @@ public class Main extends Application {
     static {
         try {
             s = new Socket("localhost", 8888);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println("Client stop");
         }
     }
 

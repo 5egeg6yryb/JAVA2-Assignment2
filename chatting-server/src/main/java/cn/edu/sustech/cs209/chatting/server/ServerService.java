@@ -9,11 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import org.omg.CORBA.SystemException;
 
 public class ServerService implements Runnable {
   private Socket s;
   private Scanner in;
   private PrintWriter out;
+
+  private String username;
 
   public ServerService(Socket s){
     this.s = s;
@@ -26,13 +29,21 @@ public class ServerService implements Runnable {
         in = new Scanner(s.getInputStream());
         out = new PrintWriter(s.getOutputStream());
         doService();
-      } finally {
+      }
+      finally {
+        System.out.println("client close");
+        try {
+          Main.usernames.remove(this.username);
+        } catch (Exception ignored){
+
+        }
+
         s.close();
       }
 
-    }catch (IOException exception){
-      exception.printStackTrace();
+    }catch (Exception ignored){
     }
+
   }
   public void doService() throws IOException{
     while (true){
@@ -46,6 +57,7 @@ public class ServerService implements Runnable {
       case "AddUser":
         String name = in.next();
         Main.usernames.add(name);
+        this.username = name;
         Main.sockets.put(name, this.s);
         System.out.println("AddUser: " + name);
         break;
@@ -149,6 +161,16 @@ public class ServerService implements Runnable {
           }
         }
 
+        break;
+
+      case "New":
+        long timestamp3 = in.nextLong();
+        String sendBy3 = in.next();
+        String sendTo3 = in.next();
+        String data3 = in.nextLine();
+
+        out.println("Load " + timestamp3 + " " + sendBy3 + " " + sendTo3 + " " + data3);
+        out.flush();
         break;
 
     }
