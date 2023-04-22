@@ -173,6 +173,19 @@ public class ServerService implements Runnable {
         out.flush();
         break;
 
+      case "File":
+        String file = in.next();
+        String sendBy4 = in.next();
+        String sendTo4 = in.next();
+        String data4 = in.nextLine();
+
+        PrintWriter out2other2 = new PrintWriter(Main.sockets.get(sendTo4).getOutputStream());
+
+        out2other2.println("File "+ file + " " + sendBy4 + " " + sendTo4 + " " + data4);
+        out2other2.flush();
+
+        break;
+
     }
   }
   public void LoadMessages(List<Message> messages){

@@ -2,6 +2,7 @@ package cn.edu.sustech.cs209.chatting.client;
 
 import cn.edu.sustech.cs209.chatting.common.Message;
 import java.awt.Color;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
@@ -79,7 +80,7 @@ public class ClientService implements Runnable {
         String sendTo = in.next();
         String data = in.nextLine();
 
-        Message message = new Message(timestamp, sendBy, sendTo, data.replace("#", "\n"));
+        Message message = new Message(timestamp, sendBy, sendTo, data.replace("#", "\n"+"  "));
         if (Main.To.equals(sendBy)) {
           Platform.runLater(new Runnable() {
             @Override
@@ -121,7 +122,7 @@ public class ClientService implements Runnable {
           @Override
           public void run() {
             chatContentList.getItems().add(new Message(timestamp2, sendBy2, sendTo2,
-                data2.replace("#", "\n")
+                data2.replace("#", "\n"+"  ")
             ));
           }
         });
@@ -134,7 +135,7 @@ public class ClientService implements Runnable {
         String sendTo3 = in.next();
         String data3 = in.nextLine();
 
-        Message message3 = new Message(timestamp3, sendBy3, sendTo3, data3.replace("#", "\n"));
+        Message message3 = new Message(timestamp3, sendBy3, sendTo3, data3.replace("#", "\n"+"  "));
         if (Main.To.equals(sendTo3)){
           Platform.runLater(new Runnable() {
             @Override
@@ -159,6 +160,20 @@ public class ClientService implements Runnable {
             }
           });
         }
+
+        break;
+
+      case "File":
+        String file = in.next();
+        String sendBy4 = in.next();
+        String sendTo4 = in.next();
+        String data4 = in.nextLine();
+
+        System.out.println(data4.substring(2));
+
+        FileWriter fw = new FileWriter("C:\\Users\\Xieyudong\\Desktop\\" + file);
+        fw.write(data4.substring(2).replace("#", "\r\n"));
+        fw.close();
 
         break;
 

@@ -1,7 +1,14 @@
 package cn.edu.sustech.cs209.chatting.client;
 
 import cn.edu.sustech.cs209.chatting.common.Message;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -255,7 +262,7 @@ public class Controller implements Initializable {
      * After sending the message, you should clear the text input field.
      */
     @FXML
-    public void doSendMessage() {
+    public void doSendMessage() throws IOException {
         // TODO
         String data = inputArea.getText();
         if (!data.equals("")) {
@@ -277,6 +284,29 @@ public class Controller implements Initializable {
                 out.println("SendGroup " + message.getTimestamp() + " " + message.getSentBy() + " "
                     + message.getSendTo() + " " + message.getData().replace("\n", "#"));
                 out.flush();
+            }
+            if (data.contains("file") && data.contains(".txt")){
+                String path = data.split(" ")[1];
+                //D:\\Idea project\\JAVA2-Assignment2\\chatting-client\\src\\main\\java\\cn\\edu\\sustech\\cs209\\chatting\\client\\send.txt
+                Scanner scanner = new Scanner(
+                    Paths.get("D:\\Idea project\\JAVA2-Assignment2\\chatting-client\\src\\main"
+                        + "\\java\\cn\\edu\\sustech\\cs209\\chatting\\client\\" + path),
+                    StandardCharsets.UTF_8.name());
+                String content = scanner.useDelimiter("\\A").next();
+                scanner.close();
+
+                System.out.println("content:" + content);
+
+
+                System.out.println("File " + path + " " + username + " "
+                    + Main.To + " " + content.replace("\r\n", "#"));
+
+                out.println("File " + path + " " + username + " "
+                    + Main.To + " " + content.replace("\r\n", "#"));
+                out.flush();
+            }
+            if (data.contains("file") && data.contains(".docx")){
+                String path = data.split(" ")[1];
 
 
             }
