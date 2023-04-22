@@ -285,7 +285,7 @@ public class Controller implements Initializable {
                     + message.getSendTo() + " " + message.getData().replace("\n", "#"));
                 out.flush();
             }
-            if (data.contains("file") && data.contains(".txt")){
+            if (data.contains("file")){
                 String path = data.split(" ")[1];
                 //D:\\Idea project\\JAVA2-Assignment2\\chatting-client\\src\\main\\java\\cn\\edu\\sustech\\cs209\\chatting\\client\\send.txt
                 Scanner scanner = new Scanner(
@@ -304,11 +304,6 @@ public class Controller implements Initializable {
                 out.println("File " + path + " " + username + " "
                     + Main.To + " " + content.replace("\r\n", "#"));
                 out.flush();
-            }
-            if (data.contains("file") && data.contains(".docx")){
-                String path = data.split(" ")[1];
-
-
             }
         }
 
