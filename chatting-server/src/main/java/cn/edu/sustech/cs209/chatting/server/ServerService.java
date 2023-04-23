@@ -150,7 +150,7 @@ public class ServerService implements Runnable {
 
         String [] receivers = Main.Group2Member.get(sendTo2);
         for (String receiver : receivers){
-          if (!receiver.equals(sendBy2)) {
+          if ((!receiver.equals(sendBy2)) && (Main.usernames.contains(receiver))) {
             PrintWriter out2receiver = new PrintWriter(
                 Main.sockets.get(receiver).getOutputStream());
             out2receiver.println(
