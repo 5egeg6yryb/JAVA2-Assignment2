@@ -34,6 +34,10 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+
 public class Controller implements Initializable {
 
   @FXML
@@ -282,7 +286,7 @@ public class Controller implements Initializable {
             + message.getSendTo() + " " + message.getData().replace("\n", "#"));
         out.flush();
       }
-      if (data.contains("file")) {
+      if (data.contains("file") && data.contains(".txt")) {
         String path = data.split(" ")[1];
         //D:\\Idea project\\JAVA2-Assignment2\\chatting-client\\src\\main\\java\\cn\\edu\\sustech\\cs209\\chatting\\client\\send.txt
         Scanner scanner = new Scanner(
@@ -299,6 +303,22 @@ public class Controller implements Initializable {
 
         out.println("File " + path + " " + username + " "
             + Main.To + " " + content.replace("\r\n", "#"));
+        out.flush();
+      }
+
+      if (data.contains("file") && data.contains(".docx")) {
+        String path = data.split(" ")[1];
+        FileInputStream fis = new FileInputStream("D:\\Idea project\\JAVA2-Assignment2\\chatting-client\\src\\main"
+            + "\\java\\cn\\edu\\sustech\\cs209\\chatting\\client\\" + path);
+        XWPFDocument document = new XWPFDocument(fis);
+        XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+        String text = extractor.getText();
+
+        System.out.println("File " + path + " " + username + " "
+            + Main.To + " " + text.replace("\n", "#"));
+
+        out.println("File " + path + " " + username + " "
+            + Main.To + " " + text.replace("\n", "#"));
         out.flush();
       }
     }

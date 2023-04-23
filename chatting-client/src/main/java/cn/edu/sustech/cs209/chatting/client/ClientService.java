@@ -2,6 +2,8 @@ package cn.edu.sustech.cs209.chatting.client;
 
 import cn.edu.sustech.cs209.chatting.common.Message;
 import java.awt.Color;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,6 +11,10 @@ import java.util.Scanner;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 
 public class ClientService implements Runnable {
 
@@ -171,9 +177,27 @@ public class ClientService implements Runnable {
 
         System.out.println(data4.substring(2));
 
-        FileWriter fw = new FileWriter("C:\\Users\\Xieyudong\\Desktop\\" + file);
-        fw.write(data4.substring(2).replace("#", "\r\n"));
-        fw.close();
+        if (file.contains(".txt")) {
+          FileWriter fw = new FileWriter("C:\\Users\\Xieyudong\\Desktop\\" + file);
+          fw.write(data4.substring(2).replace("#", "\r\n"));
+          fw.close();
+        }
+        if (file.contains(".docx")) {
+          XWPFDocument document = new XWPFDocument();
+          XWPFParagraph paragraph = document.createParagraph();
+          XWPFRun run = paragraph.createRun();
+          data4 = data4.substring(2);
+
+          String[] lines = data4.split("#");
+
+          for (String line : lines) {
+            run.setText(line);
+            run.addBreak();
+          }
+
+          FileOutputStream out = new FileOutputStream("C:\\Users\\Xieyudong\\Desktop\\" + file);
+          document.write(out);
+        }
 
         break;
 
