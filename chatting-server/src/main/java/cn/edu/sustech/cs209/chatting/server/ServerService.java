@@ -12,13 +12,14 @@ import java.util.stream.Collectors;
 import org.omg.CORBA.SystemException;
 
 public class ServerService implements Runnable {
+
   private Socket s;
   private Scanner in;
   private PrintWriter out;
 
   private String username;
 
-  public ServerService(Socket s){
+  public ServerService(Socket s) {
     this.s = s;
   }
 
@@ -29,29 +30,32 @@ public class ServerService implements Runnable {
         in = new Scanner(s.getInputStream());
         out = new PrintWriter(s.getOutputStream());
         doService();
-      }
-      finally {
+      } finally {
         System.out.println("client close");
         try {
           Main.usernames.remove(this.username);
-        } catch (Exception ignored){
+        } catch (Exception ignored) {
 
         }
 
         s.close();
       }
 
-    }catch (Exception ignored){
+    } catch (Exception ignored) {
     }
 
   }
-  public void doService() throws IOException{
-    while (true){
-      if (!in.hasNext()) return;
+
+  public void doService() throws IOException {
+    while (true) {
+      if (!in.hasNext()) {
+        return;
+      }
       String command = in.next();
       executeCommand(command);
     }
   }
+
   public void executeCommand(String commend) throws IOException {
     switch (commend) {
       case "AddUser":
@@ -65,8 +69,8 @@ public class ServerService implements Runnable {
       case "CheckUser":
         String input = in.next();
         boolean valid = true;
-        for (int i = 0; i < Main.usernames.size(); i++){
-          if (Main.usernames.get(i).equals(input)){
+        for (int i = 0; i < Main.usernames.size(); i++) {
+          if (Main.usernames.get(i).equals(input)) {
             out.println(1);
             out.flush();
             valid = false;
@@ -74,7 +78,7 @@ public class ServerService implements Runnable {
             break;
           }
         }
-        if (valid){
+        if (valid) {
           out.println(0);
           out.flush();
           System.out.println("Valid Username: " + input);
@@ -83,12 +87,12 @@ public class ServerService implements Runnable {
 
       case "GetUser":
         String names = "";
-        for (int i = 0; i < Main.usernames.size(); i++){
+        for (int i = 0; i < Main.usernames.size(); i++) {
           names += Main.usernames.get(i) + "@";
         }
         out.println("list " + names);
         out.flush();
-        System.out.println("getAllUsers: " +names);
+        System.out.println("getAllUsers: " + names);
         break;
 
       case "Send":
@@ -102,9 +106,9 @@ public class ServerService implements Runnable {
 
         PrintWriter out2other = new PrintWriter(Main.sockets.get(sendTo).getOutputStream());
 
-        out2other.println("Send "+ timestamp + " " + sendBy + " " + sendTo + " " + data);
+        out2other.println("Send " + timestamp + " " + sendBy + " " + sendTo + " " + data);
         out2other.flush();
-        System.out.println("Send "+ timestamp + " " + sendBy + " " + sendTo + " " + data);
+        System.out.println("Send " + timestamp + " " + sendBy + " " + sendTo + " " + data);
 
         break;
 
@@ -114,15 +118,14 @@ public class ServerService implements Runnable {
         String To = in.next();
 
         List<Message> messages;
-        if (To.contains("(")){
+        if (To.contains("(")) {
           String[] users = Main.Group2Member.get(To);
           out.println("Load " + System.currentTimeMillis() + " Server " + By + " " + To + " "
-          + Arrays.toString(users));
+              + Arrays.toString(users));
           out.flush();
           messages = Main.GroupMessage.stream().filter(a -> (a.getSendTo().equals(To)))
               .collect(Collectors.toList());
-        }
-        else{
+        } else {
           messages = Main.PrivateMessage.stream()
               .filter(a -> (a.getSentBy().equals(By) && a.getSendTo().equals(To))
                   || (a.getSentBy().equals(To) && a.getSendTo().equals(By)))
@@ -148,8 +151,8 @@ public class ServerService implements Runnable {
         Message message2 = new Message(timestamp2, sendBy2, sendTo2, data2);
         Main.GroupMessage.add(message2);
 
-        String [] receivers = Main.Group2Member.get(sendTo2);
-        for (String receiver : receivers){
+        String[] receivers = Main.Group2Member.get(sendTo2);
+        for (String receiver : receivers) {
           if ((!receiver.equals(sendBy2)) && (Main.usernames.contains(receiver))) {
             PrintWriter out2receiver = new PrintWriter(
                 Main.sockets.get(receiver).getOutputStream());
@@ -181,15 +184,16 @@ public class ServerService implements Runnable {
 
         PrintWriter out2other2 = new PrintWriter(Main.sockets.get(sendTo4).getOutputStream());
 
-        out2other2.println("File "+ file + " " + sendBy4 + " " + sendTo4 + " " + data4);
+        out2other2.println("File " + file + " " + sendBy4 + " " + sendTo4 + " " + data4);
         out2other2.flush();
 
         break;
 
     }
   }
-  public void LoadMessages(List<Message> messages){
-    if(messages.size()==0){
+
+  public void LoadMessages(List<Message> messages) {
+    if (messages.size() == 0) {
       return;
     }
     for (Message message : messages) {
