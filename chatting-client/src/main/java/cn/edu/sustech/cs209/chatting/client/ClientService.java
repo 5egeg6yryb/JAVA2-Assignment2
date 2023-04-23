@@ -39,10 +39,9 @@ public class ClientService implements Runnable {
         in = Main.in;
         out = Main.out;
         doService();
-      } catch (Exception e){
+      } catch (Exception e) {
 
-      }
-      finally {
+      } finally {
         Main.s.close();
         System.out.println("Server Closed");
         Platform.runLater(new Runnable() {
@@ -56,8 +55,7 @@ public class ClientService implements Runnable {
       }
     } catch (Exception exception) {
       exception.printStackTrace();
-    }
-    finally {
+    } finally {
       System.out.println("Client Closed");
     }
   }
@@ -86,7 +84,7 @@ public class ClientService implements Runnable {
         String sendTo = in.next();
         String data = in.nextLine();
 
-        Message message = new Message(timestamp, sendBy, sendTo, data.replace("#", "\n"+"  "));
+        Message message = new Message(timestamp, sendBy, sendTo, data.replace("#", "\n" + "  "));
         if (Main.To.equals(sendBy)) {
           Platform.runLater(new Runnable() {
             @Override
@@ -94,16 +92,15 @@ public class ClientService implements Runnable {
               chatContentList.getItems().add(message);
             }
           });
-        }
-        else{
+        } else {
           Platform.runLater(new Runnable() {
             @Override
             public void run() {
-              if (!chatList.getItems().contains(sendBy)){
+              if (!chatList.getItems().contains(sendBy)) {
                 chatList.getItems().add(sendBy);
               }
-              for (int i = 0; i<chatList.getItems().size();i++){
-                if (chatList.getItems().get(i).equals(sendBy)){
+              for (int i = 0; i < chatList.getItems().size(); i++) {
+                if (chatList.getItems().get(i).equals(sendBy)) {
 //                  chatList.getSelectionModel().select(i);
 //                  Main.To = chatList.getItems().get(i);
 
@@ -128,7 +125,7 @@ public class ClientService implements Runnable {
           @Override
           public void run() {
             chatContentList.getItems().add(new Message(timestamp2, sendBy2, sendTo2,
-                data2.replace("#", "\n"+"  ")
+                data2.replace("#", "\n" + "  ")
             ));
           }
         });
@@ -141,24 +138,24 @@ public class ClientService implements Runnable {
         String sendTo3 = in.next();
         String data3 = in.nextLine();
 
-        Message message3 = new Message(timestamp3, sendBy3, sendTo3, data3.replace("#", "\n"+"  "));
-        if (Main.To.equals(sendTo3)){
+        Message message3 = new Message(timestamp3, sendBy3, sendTo3,
+            data3.replace("#", "\n" + "  "));
+        if (Main.To.equals(sendTo3)) {
           Platform.runLater(new Runnable() {
             @Override
             public void run() {
               chatContentList.getItems().add(message3);
             }
           });
-        }
-        else{
+        } else {
           Platform.runLater(new Runnable() {
             @Override
             public void run() {
-              if (!chatList.getItems().contains(sendTo3)){
+              if (!chatList.getItems().contains(sendTo3)) {
                 chatList.getItems().add(sendTo3);
               }
-              for (int i = 0; i<chatList.getItems().size();i++){
-                if (chatList.getItems().get(i).equals(sendTo3)){
+              for (int i = 0; i < chatList.getItems().size(); i++) {
+                if (chatList.getItems().get(i).equals(sendTo3)) {
                   break;
 
                 }
