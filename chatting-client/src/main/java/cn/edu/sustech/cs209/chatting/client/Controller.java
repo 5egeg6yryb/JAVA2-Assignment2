@@ -105,7 +105,7 @@ public class Controller implements Initializable {
         });
 
     chatContentList.setCellFactory(new MessageCellFactory());
-    new Thread(new ClientService(chatContentList, chatList)).start();
+    new Thread(new ClientService(chatContentList, chatList, chatListName)).start();
 
   }
 

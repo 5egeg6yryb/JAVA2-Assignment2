@@ -1,13 +1,12 @@
 package cn.edu.sustech.cs209.chatting.client;
 
 import cn.edu.sustech.cs209.chatting.common.Message;
-import java.awt.Color;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.Set;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
@@ -27,9 +26,12 @@ public class ClientService implements Runnable {
   @FXML
   ListView<String> chatList;
 
-  public ClientService(ListView<Message> chat, ListView<String> chatList) {
+  Set<String> chatListName;
+
+  public ClientService(ListView<Message> chat, ListView<String> chatList, Set<String> chatListName) {
     chatContentList = chat;
     this.chatList = chatList;
+    this.chatListName = chatListName;
   }
 
   @Override
@@ -98,6 +100,7 @@ public class ClientService implements Runnable {
             public void run() {
               if (!chatList.getItems().contains(sendBy)) {
                 chatList.getItems().add(sendBy);
+                chatListName.add(sendBy);
               }
               for (int i = 0; i < chatList.getItems().size(); i++) {
                 if (chatList.getItems().get(i).equals(sendBy)) {
