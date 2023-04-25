@@ -34,6 +34,7 @@ public class ServerService implements Runnable {
         System.out.println("client close");
         try {
           Main.usernames.remove(this.username);
+          Main.sockets.remove(this.username);
         } catch (Exception ignored) {
 
         }
